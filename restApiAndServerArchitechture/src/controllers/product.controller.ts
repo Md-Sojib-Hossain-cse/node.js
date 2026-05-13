@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import { readProduct, writeProduct } from "../services/product.service";
 import type { IProduct } from "../types/product.type";
-import { parseBody } from "../utility/parseBody";
+import { parseBody, sendResponse } from "../utility/parseBody";
 
 export const productController = async (
   req: IncomingMessage,
@@ -18,24 +18,25 @@ export const productController = async (
   //get all product
   if (url === "/products" && method === "GET") {
     const result = readProduct();
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(
-      JSON.stringify({
-        message: "Products Retrieve Successfully!",
-        data: result,
-      }),
+
+    return sendResponse(
+      res,
+      true,
+      "Product Retrieve Successfully!",
+      result,
+      200,
     );
   }
   //get single product
   else if (method === "GET" && id !== null) {
     const products = readProduct();
     const product = products.find((p: IProduct) => p.id === id);
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(
-      JSON.stringify({
-        message: "Product Retrieve Successfully!",
-        data: product,
-      }),
+    return sendResponse(
+      res,
+      true,
+      "Product Retrieve Successfully!",
+      product,
+      200,
     );
   }
   //create product
@@ -52,12 +53,12 @@ export const productController = async (
 
     writeProduct(products);
 
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(
-      JSON.stringify({
-        message: "Product Retrieve Successfully!",
-        data: newProduct,
-      }),
+    return sendResponse(
+      res,
+      true,
+      "Product Retrieve Successfully!",
+      newProduct,
+      200,
     );
   }
 
@@ -70,8 +71,7 @@ export const productController = async (
     const index = products.findIndex((p: IProduct) => p.id === id);
 
     if (index < 0) {
-      res.writeHead(404, { "content-type": "application/json" });
-      res.end(JSON.stringify({ message: "product not found!", data: null }));
+      return sendResponse(res, false, "product not found!", null, 404);
     }
 
     products[index] = {
@@ -81,12 +81,12 @@ export const productController = async (
 
     writeProduct(products);
 
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(
-      JSON.stringify({
-        message: "Product updated Successfully!",
-        data: products[index],
-      }),
+    return sendResponse(
+      res,
+      true,
+      "Product updated Successfully!",
+      products[index],
+      200,
     );
   }
 
@@ -96,20 +96,13 @@ export const productController = async (
     const index = products.findIndex((p: IProduct) => p.id === id);
 
     if (index < 0) {
-      res.writeHead(404, { "content-type": "application/json" });
-      res.end(JSON.stringify({ message: "product not found!", data: null }));
+      return sendResponse(res, false, "product not found!", null, 404);
     }
 
     products.splice(index, 1);
 
     writeProduct(products);
 
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(
-      JSON.stringify({
-        message: "Product deleted Successfully!",
-        data: null,
-      }),
-    );
+    return sendResponse(res, true, "Product deleted Successfully!", null, 200);
   }
 };

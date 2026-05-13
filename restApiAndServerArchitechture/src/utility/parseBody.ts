@@ -1,4 +1,4 @@
-import type { IncomingMessage } from "http";
+import type { IncomingMessage, ServerResponse } from "http";
 
 export const parseBody = (req: IncomingMessage): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -14,4 +14,20 @@ export const parseBody = (req: IncomingMessage): Promise<any> => {
       }
     });
   });
+};
+
+export const sendResponse = (
+  res: ServerResponse,
+  success: boolean,
+  message: string,
+  data: any,
+  statusCode: number,
+) => {
+  res.writeHead(statusCode, { "content-type": "application/json" });
+  res.end(
+    JSON.stringify({
+      message: message,
+      data: data || null,
+    }),
+  );
 };
