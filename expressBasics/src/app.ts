@@ -4,10 +4,10 @@ import express, {
   type Response,
 } from "express";
 
-import { pool } from "./db";
 import { userRoutes } from "./modules/user/user.routes";
 import { profileRoutes } from "./modules/profile/profile.route";
 import { authRoutes } from "./modules/auth/auth.route";
+import logger from "./middleware/logger";
 
 const app: Application = express();
 
@@ -16,6 +16,8 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(logger);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
