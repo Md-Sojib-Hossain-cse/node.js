@@ -2,8 +2,9 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import type { NextFunction, Request, Response } from "express";
 import config from "../config";
 import { pool } from "../db";
+import type { TUserRoles } from "../types";
 
-const auth = (...roles: string[]) => {
+const auth = (...roles: TUserRoles[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       // console.log(req.headers.authorization);
@@ -12,6 +13,7 @@ const auth = (...roles: string[]) => {
       //verify the token
       //check if the user exists
       //check if status is active
+      //check user roles
       const token = req?.headers?.authorization;
 
       console.log(roles);
@@ -46,6 +48,13 @@ const auth = (...roles: string[]) => {
       }
 
       if (!user?.is_active) {
+        res.status(403).json({
+          success: false,
+          message: "Forbidden!",
+        });
+      }
+
+      if (roles.length && roles.includes(user.role)) {
         res.status(403).json({
           success: false,
           message: "Forbidden!",
